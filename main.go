@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"regexp"
 )
 
 type Range struct {
@@ -38,6 +39,155 @@ func lastAddr(n *net.IPNet) (net.IP, error) { // works when the n is a prefix, o
 	return ip, nil
 }
 
+var regionMap = map[string]string{
+	// Azure mappings
+	"westeurope":         "eu-west",
+	"eastus":             "us-east",
+	"northeurope":        "eu-north",
+	"centralus":          "us-central",
+	"southcentralus":     "us-southcentral",
+	"westus":             "us-west",
+	"southeastasia":      "ap-southeast",
+	"eastasia":           "ap-east",
+	"northcentralus":     "us-northcentral",
+	"uksouth":            "eu-west",
+	"australiaeast":      "ap-southeast",
+	"canadacentral":      "ca-central",
+	"japaneast":          "ap-northeast",
+	"eastus2euap":        "us-east", // Early Updates Access Program
+	"centralindia":       "ap-south",
+	"australiasoutheast": "ap-southeast",
+	"brazilsouth":        "sa-east",
+	"centralfrance":      "eu-west",
+	"westcentralus":      "us-westcentral",
+	"ukwest":             "eu-west",
+	"koreacentral":       "ap-northeast",
+	"japanwest":          "ap-northeast",
+	"southafricanorth":   "af-south",
+	"westus3":            "us-west",
+	"germanywc":          "eu-central",
+	"centraluseuap":      "us-central", // Early Updates Access Program
+	"canadaeast":         "ca-east",
+	"uaenorth":           "me-south",
+	"southindia":         "ap-south",
+	"switzerlandn":       "eu-central",
+	"norwaye":            "eu-north",
+	"swedencentral":      "eu-north", // I think this is right?
+	"koreasouth":         "ap-northeast",
+	"westindia":          "ap-south",
+	"uaecentral":         "me-central",
+	"southfrance":        "eu-west",
+	"southafricawest":    "af-southwest",
+	"switzerlandw":       "eu-central",
+	"australiacentral":   "ap-southeast",
+	"germanyn":           "eu-central",
+	"usstagee":           "usstagee", // wtf is this?
+	"brazilse":           "sa-southeast",
+	"qatarcentral":       "qatarcentral", // wtf is this?
+	"swedensouth":        "eu-north",
+	"norwayw":            "eu-north",
+	"australiacentral2":  "ap-southeast",
+	"jioindiawest":       "ap-south",
+	"jioindiacentral":    "ap-south",
+	"isrealcentral":      "me-south", // I don't know where Isreal is....
+	"polandcentral":      "eu-east",
+	"usstagec":           "", // wtf is this?
+	"uksouth2":           "eu-west",
+	"eastusslv":          "", // wtf is this?
+	"uknorth":            "eu-west",
+	"taiwannorth":        "ap-northeast",
+	"taiwannorthwest":    "ap-northeast",
+	"austriaeast":        "ap-southeast",
+	"spaincentral":       "", // I don't know?????
+	"newzealandnorth":    "ap-southeast",
+	"mexicocentral":      "sa-north",
+	"italynorth":         "eu-south",
+	"northeurope2":       "eu-north",
+	"malaysiawest":       "ap-west",
+	"indiasouthcentral":  "ap-south",
+	"chilec":             "",
+	"belgiumcentral":     "eu-central",
+	"easteurope":         "eu-east",
+	"brazilne":           "sa-northeast",
+	// Google Mappings
+	"us-central1":             "us-central",
+	"europe-west1":            "eu-west",
+	"us-east1":                "us-east",
+	"asia-east1":              "ap-east",
+	"us-east4":                "us-east",
+	"global":                  "global",
+	"asia-southeast1":         "ap-southeast",
+	"us-west1":                "us-west",
+	"asia-northeast1":         "ap-northeast",
+	"europe-west2":            "eu-west",
+	"europe-west3":            "eu-west",
+	"australia-southeast1":    "ap-southeast",
+	"asia-northeast3":         "ap-northeast",
+	"southamerica-east1":      "sa-east",
+	"europe-west4":            "eu-west",
+	"us-west2":                "us-west",
+	"asia-south1":             "ap-south",
+	"asia-east2":              "ap-east",
+	"northamerica-northeast1": "ca-east",
+	"us-central2":             "us-central",
+	"europe-north1":           "eu-north",
+	"europe-west6":            "eu-west",
+	"asia-southeast2":         "ap-southeast",
+	"asia-northeast2":         "ap-northeast",
+	"us-west3":                "us-west",
+	"us-west4":                "us-west",
+	"northamerica-northeast2": "ca-east",
+	"europe-west9":            "eu-west",
+	"europe-central2":         "eu-central",
+	"australia-southeast2":    "ap-southeast",
+	"asia-south2":             "ap-south",
+	"us-east7":                "us-east",
+	"southamerica-west1":      "sa-west",
+	"europe-west8":            "eu-west",
+	// Oracle Mappings
+	"us-ashburn-1":      "us-east",
+	"eu-frankfurt-1":    "eu-central",
+	"us-phoenix-1":      "us-west",
+	"uk-london-1":       "eu-west",
+	"sa-saopaulo-1":     "sa-east",
+	"eu-amsterdam-1":    "eu-central",
+	"ap-mumbai-1":       "ap-south",
+	"ap-seoul-1":        "ap-northeast",
+	"ap-tokyo-1":        "ap-northeast",
+	"us-sanjose-1":      "us-west",
+	"eu-zurich-1":       "eu-central",
+	"ap-sydney-1":       "ap-southeast",
+	"ap-hyderabad-1":    "ap-south",
+	"ap-chuncheon-1":    "ap-northeast",
+	"me-jeddah-1":       "me-south",
+	"ap-osaka-1":        "ap-northeast",
+	"ca-toronto-1":      "ca-east",
+	"uk-cardiff-1":      "eu-west",
+	"ap-singapore-1":    "ap-northeast",
+	"ap-melbourne-1":    "ap-southeast",
+	"sa-santiago-1":     "sa-west",
+	"ca-montreal-1":     "ca-east",
+	"me-dubai-1":        "ap-south",
+	"eu-marseille-1":    "eu-west",
+	"sa-vinhedo-1":      "sa-east",
+	"me-abudhabi-1":     "me-south", // I actually don't know where this is
+	"il-jerusalem-1":    "me-south", // I think?
+	"eu-stockholm-1":    "eu-north",
+	"eu-milan-1":        "eu-south", // I think?
+	"af-johannesburg-1": "af-south",
+}
+
+func normalizeRegion(region string) string {
+	if v, ok := regionMap[region]; ok && v != "" {
+		return v
+	}
+
+	re := regexp.MustCompile("\\-[0-9]")
+	region = re.ReplaceAllString(region, "")
+
+	return region
+}
+
 func (r *Range) MarshalJSON() ([]byte, error) {
 	if r.Prefix.IP.To4() == nil {
 		return nil, errors.New("does not support IPv6 addresses.")
@@ -46,19 +196,21 @@ func (r *Range) MarshalJSON() ([]byte, error) {
 	last, _ := lastAddr(r.Prefix)
 
 	return json.Marshal(&struct {
-		Source  string
-		Service string
-		Region  string
-		Prefix  string
-		Start   uint32
-		End     uint32
+		Source     string
+		Service    string
+		Region     string
+		RegionNorm string
+		Prefix     string
+		Start      uint32
+		End        uint32
 	}{
-		Source:  r.Source,
-		Service: r.Service,
-		Region:  r.Region,
-		Prefix:  r.Prefix.String(),
-		Start:   ip2uint32(r.Prefix.IP),
-		End:     ip2uint32(last),
+		Source:     r.Source,
+		Service:    r.Service,
+		Region:     r.Region,
+		RegionNorm: normalizeRegion(r.Region),
+		Prefix:     r.Prefix.String(),
+		Start:      ip2uint32(r.Prefix.IP),
+		End:        ip2uint32(last),
 	})
 }
 
@@ -84,6 +236,30 @@ type awsFormat struct {
 		Service  string `json:"service"`
 		Border   string `json:"network_border_group"`
 	} `json:"prefixes"`
+}
+
+/*
+{
+    "last_updated_timestamp": "2022-03-10T09:21:01.020884",
+    "regions": [
+        {
+            "region": "us-phoenix-1",
+            "cidrs": [
+                {
+                    "cidr": "129.146.0.0/21",
+                    "tags": [
+                        "OCI"
+                    ]
+                },
+*/
+type oracleFormat struct {
+	Regions []struct {
+		Region string `json:"region"`
+		Cidrs  []struct {
+			Cidr string   `json:"cidr"`
+			Tags []string `json:"tags"`
+		} `json:"cidrs"`
+	} `json:"regions"`
 }
 
 type googleFormat struct {
@@ -138,6 +314,36 @@ func parseAws(r io.Reader) (Ranges, error) {
 	return ret, nil
 }
 
+func parseOracle(r io.Reader) (Ranges, error) {
+	var dat oracleFormat
+
+	jd := json.NewDecoder(r)
+	if err := jd.Decode(&dat); err != nil {
+		return nil, err
+	}
+
+	ret := make(Ranges, 0)
+
+	for _, ent := range dat.Regions {
+		reg := ent.Region
+		cidrs := ent.Cidrs
+		for _, cidr := range cidrs {
+			_, ipnet, err := net.ParseCIDR(cidr.Cidr)
+			if err != nil {
+				return nil, err
+			}
+			ret = append(ret, &Range{
+				Source: "ORACLE",
+				Region: reg,
+				Prefix: ipnet,
+			})
+		}
+	}
+
+	return ret, nil
+
+}
+
 func parseAzure(r io.Reader) (Ranges, error) {
 	var dat azureFormat
 
@@ -149,9 +355,13 @@ func parseAzure(r io.Reader) (Ranges, error) {
 	ret := make(Ranges, 0)
 
 	for _, ent := range dat.Values {
-		src := ent.Properties.Platform
+		//src := ent.Properties.Platform
 		svc := ent.Properties.Service
 		reg := ent.Properties.Region
+
+		if reg == "" {
+			continue
+		}
 
 		for _, ip := range ent.Properties.AddressPrefixes {
 			_, ipnet, err := net.ParseCIDR(ip)
@@ -160,7 +370,7 @@ func parseAzure(r io.Reader) (Ranges, error) {
 			}
 
 			ret = append(ret, &Range{
-				Source:  src,
+				Source:  "AZURE",
 				Service: svc,
 				Region:  reg,
 				Prefix:  ipnet,
@@ -267,10 +477,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	ora, err := os.Open("./oracle-ranges.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ora.Close()
+
+	oracleRanges, err := parseOracle(ora)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	all := make(Ranges, 0)
 	all = append(all, azureRanges...)
 	all = append(all, awsRanges...)
 	all = append(all, googRanges...)
+	all = append(all, oracleRanges...)
 
 	for _, ent := range all {
 		j, err := json.Marshal(ent)
@@ -279,28 +501,5 @@ func main() {
 		}
 
 		fmt.Println(string(j))
-	}
-
-	os.Exit(1)
-
-	ln := NewLineIterator(os.Stdin)
-	for {
-		line, err := ln.Next()
-		if err != nil {
-			if err == io.EOF {
-				break
-			} else {
-				log.Fatal(err)
-			}
-		}
-
-		if r := all.Search(string(line)); r != nil {
-			ent := RangeEntry{InputIP: string(line), Range: r}
-			j, err := json.Marshal(ent)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(string(j))
-		}
 	}
 }
