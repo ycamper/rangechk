@@ -42,7 +42,17 @@ func lastAddr(n *net.IPNet) (net.IP, error) { // works when the n is a prefix, o
 // regionMap is a mapping of a cloud-specific region, and a non-cloud-specific
 // region.
 var regionMap = map[string]string{
+	// AWS mappings
+	// since we are going pretend all regions are in the same format as AWS,
+	// this is just a placeholder for anything crazy, naming-wise, we need to
+	// account for aws-wise. Otherwise we will cut off extranious data from the
+	// name, for example `ap-southeast-4` becomes `ap-southeast`.
+	// ....
 	// Azure mappings
+	"eastus2":            "us-east",
+	"usstagec":           "us-southcentral", // Azure "SouthCentralUSSTG"
+	"eastusslv":          "us-east",         // Azure East US SLV region in the Azure Cosmos DB service.
+	"westus2":            "us-west",
 	"westeurope":         "eu-west",
 	"eastus":             "us-east",
 	"northeurope":        "eu-north",
@@ -93,9 +103,7 @@ var regionMap = map[string]string{
 	"jioindiacentral":    "ap-south",
 	"isrealcentral":      "me-south", // [NEEDS-VALIDATION]
 	"polandcentral":      "eu-east",
-	"usstagec":           "", // [NEEDS-WORK] - what is "usstagec?"
 	"uksouth2":           "eu-west",
-	"eastusslv":          "", // [NEEDS-WORK] - what is "ussslv?"
 	"uknorth":            "eu-west",
 	"taiwannorth":        "ap-northeast",
 	"taiwannorthwest":    "ap-northeast",
