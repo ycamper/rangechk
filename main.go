@@ -39,6 +39,8 @@ func lastAddr(n *net.IPNet) (net.IP, error) { // works when the n is a prefix, o
 	return ip, nil
 }
 
+// regionMap is a mapping of a cloud-specific region, and a non-cloud-specific
+// region.
 var regionMap = map[string]string{
 	// Azure mappings
 	"westeurope":         "eu-west",
@@ -54,7 +56,7 @@ var regionMap = map[string]string{
 	"australiaeast":      "ap-southeast",
 	"canadacentral":      "ca-central",
 	"japaneast":          "ap-northeast",
-	"eastus2euap":        "us-east", // Early Updates Access Program
+	"eastus2euap":        "us-east", // "Early Updates Access Program" "us-east"
 	"centralindia":       "ap-south",
 	"australiasoutheast": "ap-southeast",
 	"brazilsouth":        "sa-east",
@@ -66,13 +68,13 @@ var regionMap = map[string]string{
 	"southafricanorth":   "af-south",
 	"westus3":            "us-west",
 	"germanywc":          "eu-central",
-	"centraluseuap":      "us-central", // Early Updates Access Program
+	"centraluseuap":      "us-central", // "Early Updates Access Program" "us-central"
 	"canadaeast":         "ca-east",
 	"uaenorth":           "me-south",
 	"southindia":         "ap-south",
 	"switzerlandn":       "eu-central",
 	"norwaye":            "eu-north",
-	"swedencentral":      "eu-north", // I think this is right?
+	"swedencentral":      "eu-north", // [NEEDS-VALIDATION]
 	"koreasouth":         "ap-northeast",
 	"westindia":          "ap-south",
 	"uaecentral":         "me-central",
@@ -81,31 +83,31 @@ var regionMap = map[string]string{
 	"switzerlandw":       "eu-central",
 	"australiacentral":   "ap-southeast",
 	"germanyn":           "eu-central",
-	"usstagee":           "usstagee", // wtf is this?
+	"usstagee":           "usstagee", // [NEEDS-VALIDATION] - what is "usstagee"
 	"brazilse":           "sa-southeast",
-	"qatarcentral":       "qatarcentral", // wtf is this?
+	"qatarcentral":       "qatarcentral", // [NEEDS-VALIDATION] - where is "qatarcentral" in relation to all other regions?
 	"swedensouth":        "eu-north",
 	"norwayw":            "eu-north",
 	"australiacentral2":  "ap-southeast",
 	"jioindiawest":       "ap-south",
 	"jioindiacentral":    "ap-south",
-	"isrealcentral":      "me-south", // I don't know where Isreal is....
+	"isrealcentral":      "me-south", // [NEEDS-VALIDATION]
 	"polandcentral":      "eu-east",
-	"usstagec":           "", // wtf is this?
+	"usstagec":           "", // [NEEDS-WORK] - what is "usstagec?"
 	"uksouth2":           "eu-west",
-	"eastusslv":          "", // wtf is this?
+	"eastusslv":          "", // [NEEDS-WORK] - what is "ussslv?"
 	"uknorth":            "eu-west",
 	"taiwannorth":        "ap-northeast",
 	"taiwannorthwest":    "ap-northeast",
 	"austriaeast":        "ap-southeast",
-	"spaincentral":       "", // I don't know?????
+	"spaincentral":       "", // [NEEDS-WORK]
 	"newzealandnorth":    "ap-southeast",
 	"mexicocentral":      "sa-north",
 	"italynorth":         "eu-south",
 	"northeurope2":       "eu-north",
 	"malaysiawest":       "ap-west",
 	"indiasouthcentral":  "ap-south",
-	"chilec":             "",
+	"chilec":             "", // [NEEDS-WORK]
 	"belgiumcentral":     "eu-central",
 	"easteurope":         "eu-east",
 	"brazilne":           "sa-northeast",
@@ -170,10 +172,10 @@ var regionMap = map[string]string{
 	"me-dubai-1":        "ap-south",
 	"eu-marseille-1":    "eu-west",
 	"sa-vinhedo-1":      "sa-east",
-	"me-abudhabi-1":     "me-south", // I actually don't know where this is
-	"il-jerusalem-1":    "me-south", // I think?
+	"me-abudhabi-1":     "me-south", // [NEEDS-VALIDATION]
+	"il-jerusalem-1":    "me-south", // [NEEDS-VALIDATION]
 	"eu-stockholm-1":    "eu-north",
-	"eu-milan-1":        "eu-south", // I think?
+	"eu-milan-1":        "eu-south", // [NEEDS-VALIDATION]
 	"af-johannesburg-1": "af-south",
 }
 
@@ -238,20 +240,6 @@ type awsFormat struct {
 	} `json:"prefixes"`
 }
 
-/*
-{
-    "last_updated_timestamp": "2022-03-10T09:21:01.020884",
-    "regions": [
-        {
-            "region": "us-phoenix-1",
-            "cidrs": [
-                {
-                    "cidr": "129.146.0.0/21",
-                    "tags": [
-                        "OCI"
-                    ]
-                },
-*/
 type oracleFormat struct {
 	Regions []struct {
 		Region string `json:"region"`
