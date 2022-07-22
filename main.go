@@ -95,7 +95,7 @@ var regionMap = map[string]string{
 	"polandcentral":      "eu-east",
 	"usstagec":           "us-central", // staging for US central region? https://docs.microsoft.com/en-us/azure/virtual-network/service-tags-overview
 	"uksouth2":           "eu-west",
-	"eastusslv":          "", // [NEEDS-WORK] - what is "ussslv?" US east region? https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.documents.locationnames.eastusslv?view=azure-dotnet
+	"eastusslv":          "us-east", // suggestion - US east region? https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.documents.locationnames.eastusslv?view=azure-dotnet
 	"uknorth":            "eu-west",
 	"taiwannorth":        "ap-northeast",
 	"taiwannorthwest":    "ap-northeast",
