@@ -74,40 +74,40 @@ var regionMap = map[string]string{
 	"southindia":         "ap-south",
 	"switzerlandn":       "eu-central",
 	"norwaye":            "eu-north",
-	"swedencentral":      "eu-north", // [NEEDS-VALIDATION]
+	"swedencentral":      "eu-north", // this seems correct
 	"koreasouth":         "ap-northeast",
 	"westindia":          "ap-south",
-	"uaecentral":         "me-central",
+	"uaecentral":         "me-south", // changed based on qatar, jerusalem, abudhabi
 	"southfrance":        "eu-west",
 	"southafricawest":    "af-southwest",
 	"switzerlandw":       "eu-central",
 	"australiacentral":   "ap-southeast",
 	"germanyn":           "eu-central",
-	"usstagee":           "usstagee", // [NEEDS-VALIDATION] - what is "usstagee"
+	"usstagee":           "us-east", // staging for US east region? https://docs.microsoft.com/en-us/azure/virtual-network/service-tags-overview
 	"brazilse":           "sa-southeast",
-	"qatarcentral":       "qatarcentral", // [NEEDS-VALIDATION] - where is "qatarcentral" in relation to all other regions?
+	"qatarcentral":       "me-south", // seems correct based on AWS region (Bahrain) + jerusalem, abudhabi
 	"swedensouth":        "eu-north",
 	"norwayw":            "eu-north",
 	"australiacentral2":  "ap-southeast",
 	"jioindiawest":       "ap-south",
 	"jioindiacentral":    "ap-south",
-	"isrealcentral":      "me-south", // [NEEDS-VALIDATION]
+	"israelcentral":      "me-south", // seems correct based on AWS region (Bahrain); also think this was misspelled previously
 	"polandcentral":      "eu-east",
-	"usstagec":           "", // [NEEDS-WORK] - what is "usstagec?"
+	"usstagec":           "us-central", // staging for US central region? https://docs.microsoft.com/en-us/azure/virtual-network/service-tags-overview
 	"uksouth2":           "eu-west",
-	"eastusslv":          "", // [NEEDS-WORK] - what is "ussslv?"
+	"eastusslv":          "", // [NEEDS-WORK] - what is "ussslv?" US east region? https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.documents.locationnames.eastusslv?view=azure-dotnet
 	"uknorth":            "eu-west",
 	"taiwannorth":        "ap-northeast",
 	"taiwannorthwest":    "ap-northeast",
 	"austriaeast":        "ap-southeast",
-	"spaincentral":       "", // [NEEDS-WORK]
+	"spaincentral":       "eu-south", // suggestion
 	"newzealandnorth":    "ap-southeast",
 	"mexicocentral":      "sa-north",
 	"italynorth":         "eu-south",
 	"northeurope2":       "eu-north",
 	"malaysiawest":       "ap-west",
 	"indiasouthcentral":  "ap-south",
-	"chilec":             "", // [NEEDS-WORK]
+	"chilec":             "sa-west", // suggestion
 	"belgiumcentral":     "eu-central",
 	"easteurope":         "eu-east",
 	"brazilne":           "sa-northeast",
