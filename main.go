@@ -172,10 +172,10 @@ var regionMap = map[string]string{
 	"me-dubai-1":        "ap-south",
 	"eu-marseille-1":    "eu-west",
 	"sa-vinhedo-1":      "sa-east",
-	"me-abudhabi-1":     "me-south", // [NEEDS-VALIDATION]
-	"il-jerusalem-1":    "me-south", // [NEEDS-VALIDATION]
+	"me-abudhabi-1":     "me-south", // seems correct
+	"il-jerusalem-1":    "me-south", // seems correct
 	"eu-stockholm-1":    "eu-north",
-	"eu-milan-1":        "eu-south", // [NEEDS-VALIDATION]
+	"eu-milan-1":        "eu-south", // seems correct
 	"af-johannesburg-1": "af-south",
 }
 
